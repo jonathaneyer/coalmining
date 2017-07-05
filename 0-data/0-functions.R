@@ -6,7 +6,11 @@
 #   - column 1 contains the longitude in degrees (negative in the US)
 #   - column 2 contains the latitude in degrees
 
+
+
 latlong2state <- function(pointsDF) {
+  library(mapdata)
+  library(maptools)
   # Prepare SpatialPolygons object with one SpatialPolygon
   # per state (plus DC, minus HI & AK)
   states <- map('state', fill=TRUE, col="transparent", plot=FALSE)
@@ -23,10 +27,13 @@ latlong2state <- function(pointsDF) {
   
   # Return the state names of the Polygons object containing each point
   stateNames <- sapply(states_sp@polygons, function(x) x@ID)
-  stateNames[indices]
+  return(stateNames[indices])
+  
 }
 
 latlong2county <- function(pointsDF) {
+  library(mapdata)
+  library(maptools)
   # Prepare SpatialPolygons object with one SpatialPolygon
   # per county
   counties <- map('county', fill=TRUE, col="transparent", plot=FALSE)
@@ -41,12 +48,17 @@ latlong2county <- function(pointsDF) {
   # Use 'over' to get _indices_ of the Polygons object containing each point 
   indices <- over(pointsSP, counties_sp)
   
+  
   # Return the county names of the Polygons object containing each point
   countyNames <- sapply(counties_sp@polygons, function(x) x@ID)
-  countyNames[indices]
+  return(countyNames[indices])
+  
 }
 
 latlong2congress <- function(pointsDF) {
+  library(mapdata)
+  library(raster )
+  library(maptools)
   # Prepare SpatialPolygons object with one SpatialPolygon
   # per county
   congr <- shapefile("C:/Users/Jonathan/Google Drive/coalmining/data/spatial/cb_2014_us_cd114_5m/cb_2014_us_cd114_5m.shp")
@@ -77,3 +89,6 @@ latlong2shale <- function(pointsDF) {
   #congrNames <- sapply(congr@polygons, function(x) x@ID)
   #congrNames[indices]
 }
+
+
+
