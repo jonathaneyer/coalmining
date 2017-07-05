@@ -2,6 +2,7 @@
 
 library(tidyverse)
 library(readr)
+library(readxl)
 library(dplyr)
 library(magrittr)
 library(gdata)
@@ -128,33 +129,30 @@ fercreceipts02_07$`ORIG ST`[fercreceipts02_07$BOM_DIST == 55] <- "IS"
 
 fuelreceipts08_14 <- fuelreceipts08_14[,c("YEAR","MONTH","Plant Id","Plant State","ENERGY_SOURCE","Coalmine Type","Coalmine State",
     "Coalmine County","QUANTITY","Average Heat Content","Average Sulfur Content","Average Ash Content",
-    "FUEL_COST")]   
-  #mutate(QUANTITY = as.numeric(as.character(gsub(",","",x = QUANTITY))),
-  #       FUEL_COST = as.numeric(as.character(gsub(",","",x = FUEL_COST))))
+    "FUEL_COST","Coalmine Msha Id")]   
 fuelreceipts99_01 <- fuelreceipts99_01[,c("YEAR","MONTH","PLT_CODE","PLT_ST","SPECF_FUEL",
   "MINE_TYPE","ORIG_ST","COUNTY","QUANTITY","BTU","SULFUR","ASH","COST")] %>%
-  #mutate(QUANTITY = as.numeric(as.character(gsub(",","",x = QUANTITY))),
-   #      YEAR = as.numeric(YEAR), MONTH = as.numeric(MONTH), PLT_CODE = as.numeric(PLT_CODE)) %>%
+  mutate(`Coalmine Msha Id` = NA) %>%
   setNames(names(fuelreceipts08_14))
 fuelreceipts90_98 <- fuelreceipts90_98[,c("YEAR","MONTH","PLT_CODE","PLT_ST","SPECF_FUEL",
   "MINE_TYPE","ORIG_ST","COUNTY","QUANTITY","BTU","SULFUR","ASH","COST")] %>%
-  #mutate(QUANTITY = as.numeric(as.character(gsub(",","",x = QUANTITY))),
-  #       YEAR = as.numeric(YEAR), MONTH = as.numeric(MONTH), PLT_CODE = as.numeric(PLT_CODE))%>%
+  mutate(`Coalmine Msha Id` = NA) %>%
   setNames(names(fuelreceipts08_14))
 fercreceipts02_07 <- fercreceipts02_07[c("YEAR","MONTH","PLT_CODE","PLST ST","SPECF_FUEL",
   "MINE_TYPE","ORIG ST","COUNTY","QUANTITY","BTUCONTENT","SULFUR","ASH","COST")] %>%
-  #mutate(QUANTITY = as.numeric(as.character(gsub(",","",x = QUANTITY))), PLT_CODE = as.numeric(PLT_CODE))%>%
+  mutate(`Coalmine Msha Id` = NA) %>%
   setNames(names(fuelreceipts08_14))
 eiareceipts02_07 <- eiareceipts02_07[c("YEAR","MONTH","FACILITY_CODE","FACILITY_STATE",
   "FUEL_TYPE_CODE","COALMINE_TYPE","COALMINE_STATE","COALMINE_COUNTY","QUANTITY_RECEIVED","BTU_CONTENT",
   "SULFUR_CONTENT","ASH_CONTENT","COST")] %>%
-  #mutate(QUANTITY_RECEIVED = as.numeric(as.character(gsub(",","",x = QUANTITY_RECEIVED))))%>%
+  mutate(`Coalmine Msha Id` = NA) %>%
   setNames(names(fuelreceipts08_14))
 
 coalreceipts <- bind_rows(fuelreceipts08_14, fuelreceipts99_01,fuelreceipts90_98,fercreceipts02_07,eiareceipts02_07) %>%
-  filter(ENERGY_SOURCE %in% c("BIT","SUB","LIG","ANT", `Coalmine County` != "")) %>%
-  na.omit(`Coalmine County`, `Coalmine State`) %>%
-  mutate(`Coalmine County` = as.numeric(`Coalmine County`)) 
+  mutate(`Coalmine County` = as.numeric(`Coalmine County`))  %>%
+  filter(ENERGY_SOURCE %in% c("BIT","SUB","LIG","ANT") ,`Coalmine County` != "", 
+                      !is.na(`Coalmine County`), !is.na(`Coalmine State`))
+
 names(coalreceipts)[names(coalreceipts) == "Coalmine State"] <- "Coalmine.State"
 names(coalreceipts)[names(coalreceipts) == "Coalmine County"] <- "Coalmine.County"
 
@@ -225,5 +223,8 @@ coalreceipts$coalminefips[coalreceipts$Coalmine.State == "UK"] <- 7000000 ## UK
 coalreceipts$coalminefips[coalreceipts$Coalmine.State == "VZ"] <- 8000000 ## Venezuela
 coalreceipts$coalminefips[coalreceipts$Coalmine.State == "OT"] <- 9000000 ## Other (to be dropped)
 coalreceipts$coalminefips[coalreceipts$Coalmine.State == "IM"] <- 9000000 ## Other (to be dropped)
+
+coalreceipts <- setNames(coalreceipts,make.names(names(coalreceipts),unique = T))
+
 
 write_rds(coalreceipts,path =  "C:/Users/Jonathan/Google Drive/coalmining/coalmining_git/0-data/coalreceipts.rds")
