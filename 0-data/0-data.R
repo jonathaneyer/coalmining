@@ -18,27 +18,30 @@ coalreceipts_mine_year <- coalreceipts %>%
 
 # load msha locations
 coaldata <- read_delim("C:/Users/Jonathan/Downloads/Mines/Mines.txt",delim = "|") %>%
-  mutate(MINE_ID = as.numeric(as.character(MINE_ID))) %>%
-  select(MINE_ID, LATITUDE, LONGITUDE, CURRENT_MINE_TYPE,NO_EMPLOYEES,AVG_MINE_HEIGHT)
+  mutate(MINE_ID = as.numeric(as.character(MINE_ID)), LONGITUDE = -1*LONGITUDE) %>%
+  dplyr::select(MINE_ID, LATITUDE, LONGITUDE, CURRENT_MINE_TYPE,NO_EMPLOYEES,AVG_MINE_HEIGHT)
+
+minecounties <- coalreceipts[!duplicated(coalreceipts$Coalmine.Msha.Id),c("coalminefips","Coalmine.Msha.Id")]
 
 
 # load plant locations
-plant2012 <- read_csv("C:/Users/Jonathan/Google Drive/coalmining/data/plant2012.csv") %>% 
+plant2012 <- read_csv("0-data/plant2012.csv") %>% 
   filter(!is.na(Latitude), Latitude != 0) %>%
-  select(`Utility ID`,`Plant Code`,Latitude,Longitude) 
+  dplyr::select(`Utility ID`,`Plant Code`,Latitude,Longitude) 
 plant2012 <- setNames(plant2012,make.names(names(plant2012), unique = T))
 
 # create matrix of plant-mining counties
 opts_minecounty <- expand.grid(unique(coalreceipts_county_year$YEAR), unique(coalreceipts_county_year$coalminefips),
                                unique(coalreceipts_county_year$Plant.Id)) %>% 
   inner_join(plant2012,by = c("Var3" = "Plant.Code")) %>%
-  left_join( read.delim("C:/Users/Jonathan/Google Drive/coalmining/data/Gaz_counties_national.txt") %>%
-               select(GEOID,INTPTLAT,INTPTLONG), by = c("Var2"="GEOID"))
+  left_join( read.delim("../data/Gaz_counties_national.txt") %>%
+               dplyr::select(GEOID,INTPTLAT,INTPTLONG), by = c("Var2"="GEOID"))
 
 opts_mine <- expand.grid(unique(coalreceipts_mine_year$YEAR), unique(coalreceipts_mine_year$Coalmine.Msha.Id),
                          unique(coalreceipts_mine_year$Plant.Id)) %>% 
   inner_join(plant2012,by = c("Var3" = "Plant.Code")) %>%
-  left_join(coaldata, by = c("Var2" = "MINE_ID"))
+  left_join(coaldata, by = c("Var2" = "MINE_ID")) %>%
+  left_join(minecounties, by = c("Var2" = "Coalmine.Msha.Id"))
 
 
 # recode international locations to lat/long
@@ -65,7 +68,7 @@ opts_mine <- opts_mine %>%
 opts_minecounty <- opts_minecounty %>% 
   filter(!is.na(INTPTLAT))
 
-source('C:/Users/Jonathan/Google Drive/coalmining/coalmining_git/0-data/0-functions.R')
+source('0-data/0-functions.R')
 
 opts_minecounty$minecongress <- latlong2congress(data.frame(x= opts_minecounty$INTPTLONG, y =opts_minecounty$INTPTLAT))
 opts_minecounty$plantcongress <- latlong2congress(data.frame(x= opts_minecounty$Longitude, y =opts_minecounty$Latitude))
@@ -137,9 +140,6 @@ opts_mine$minecounty <- latlong2county(data.frame(x= opts_mine$LONGITUDE, y =opt
 opts_mine$plantcounty <- latlong2county(data.frame(x= opts_mine$Longitude, y =opts_mine$Latitude))
 
 ### fix some missing intersections
-opts_mine$minestate[opts_mine$Var2 >57000] <- "Foreign"
-opts_mine$minecounty[opts_mine$Var2 >57000] <- "Foreign"
-opts_mine$minecongress[opts_mine$Var2 >57000] <- "Foreign"
 opts_mine$plantstate[opts_mine$Var3 == 10675] <- "connecticut"
 opts_mine$plantcounty[opts_mine$Var3 == 10675] <- "new london,connecticut"
 opts_mine$plantcongress[opts_mine$Var3 == 10675] <- "0902"
@@ -240,6 +240,59 @@ opts_minecounty <- opts_minecounty %>%
   filter(countyprod > 0, plantpurch_county > 0) %>%
   mutate(anytrade = x > 0, countyprod = countyprod/1000000, plantpurch_county = plantpurch_county/1000000)
 
+### add supplementary info
 
-write_rds(opts_mine,path =  "C:/Users/Jonathan/Google Drive/coalmining/coalmining_git/0-data/opts_mine.rds")
-write_rds(opts_minecounty,path =  "C:/Users/Jonathan/Google Drive/coalmining/coalmining_git/0-data/opts_minecounty.rds")
+load("../data/unemployment/unemploy90_14.R") 
+unemploy %<>% mutate(X.3 = as.numeric(as.character(X.3))) %<>%
+  dplyr::select(X.3, fips, X.8)
+
+opts_minecounty %<>% left_join(unemploy, by = c("Var1"="X.3", "Var2"="fips"))
+
+# link county fips for plants
+countyfips <- county.fips
+opts_mine %<>% left_join(countyfips, by = c("plantcounty" = "polyname"))
+opts_mine$fips[opts_mine$plantcounty == "new london,connecticut"] <- 9011
+opts_mine$fips[opts_mine$plantcounty == "bay,florida"] <- 12005
+opts_mine$fips[opts_mine$plantcounty == "monroe,michigan"] <- 26115
+opts_mine$fips[opts_mine$plantcounty == "st. clair,michigan"] <- 26147
+opts_mine$fips[opts_mine$plantcounty == "anne arundel,maryland"] <- 24003
+opts_mine$fips[opts_mine$plantcounty == "york,virginia"] <- 51199
+opts_mine$fips[opts_mine$plantcounty == "lake,ohio"] <- 39085
+opts_mine$fips[opts_mine$plantcounty == "monroe,new york"] <- 36055
+opts_mine$fips[opts_mine$plantcounty == "niagara,new york"] <- 36063
+opts_mine$fips[opts_mine$plantcounty == "wayne,michigan"] <- 26163
+opts_mine$fips[opts_mine$plantcounty == "chautauqua,new york"] <- 36013
+opts_mine$fips[opts_mine$plantcounty == "bay,michigan"] <- 26017
+opts_mine$fips[opts_mine$plantcounty == "brown,wisconsin"] <- 55009
+opts_mine$fips[opts_mine$plantcounty == "essex,massachussets"] <- 25009
+opts_mine$fips[opts_mine$plantcounty == "ottawa,michigan"] <- 26139
+opts_mine$fips[opts_mine$plantcounty == "st. louis,michigan"] <- 27137  #actually in mn
+opts_mine$fips[opts_mine$plantcounty == "hillsborough,florida"] <- 12057
+opts_mine$fips[opts_mine$plantcounty == "lorain,ohio"] <- 39093
+opts_mine$fips[opts_mine$plantcounty == "pierce,washington"] <- 53053
+
+
+opts_minecounty %<>% left_join(countyfips, by = c("plantcounty" = "polyname"))
+opts_minecounty$fips[opts_minecounty$plantcounty == "new london,connecticut"] <- 9011
+opts_minecounty$fips[opts_minecounty$plantcounty == "bay,florida"] <- 12005
+opts_minecounty$fips[opts_minecounty$plantcounty == "monroe,michigan"] <- 26115
+opts_minecounty$fips[opts_minecounty$plantcounty == "st. clair,michigan"] <- 26147
+opts_minecounty$fips[opts_minecounty$plantcounty == "anne arundel,maryland"] <- 24003
+opts_minecounty$fips[opts_minecounty$plantcounty == "york,virginia"] <- 51199
+opts_minecounty$fips[opts_minecounty$plantcounty == "lake,ohio"] <- 39085
+opts_minecounty$fips[opts_minecounty$plantcounty == "monroe,new york"] <- 36055
+opts_minecounty$fips[opts_minecounty$plantcounty == "niagara,new york"] <- 36063
+opts_minecounty$fips[opts_minecounty$plantcounty == "wayne,michigan"] <- 26163
+opts_minecounty$fips[opts_minecounty$plantcounty == "chautauqua,new york"] <- 36013
+opts_minecounty$fips[opts_minecounty$plantcounty == "bay,michigan"] <- 26017
+opts_minecounty$fips[opts_minecounty$plantcounty == "brown,wisconsin"] <- 55009
+opts_minecounty$fips[opts_minecounty$plantcounty == "essex,massachussets"] <- 25009
+opts_minecounty$fips[opts_minecounty$plantcounty == "ottawa,michigan"] <- 26139
+opts_minecounty$fips[opts_minecounty$plantcounty == "st. louis,michigan"] <- 27137  #actually in mn
+opts_minecounty$fips[opts_minecounty$plantcounty == "hillsborough,florida"] <- 12057
+opts_minecounty$fips[opts_minecounty$plantcounty == "lorain,ohio"] <- 39093
+opts_minecounty$fips[opts_minecounty$plantcounty == "pierce,washington"] <- 53053
+
+
+write_rds(opts_mine,path =  "0-data/opts_mine.rds")
+write_rds(opts_minecounty,path =  "0-data/opts_minecounty.rds")
