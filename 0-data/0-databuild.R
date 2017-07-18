@@ -9,65 +9,65 @@ library(gdata)
 # ---- start --------------------------------------------------------------
 
 
-fuelreceipts_2014 <- read_csv("C:/Users/Jonathan/Google Drive/coalmining/data/f923_2014/fuelreceipts_2014.csv") %>%
+fuelreceipts_2014 <- read_csv("../data/f923_2014/fuelreceipts_2014.csv") %>%
   mutate(FUEL_COST = as.numeric(FUEL_COST)) %>%
   select(-`Average Mercury Content`)
-fuelreceipts_2013 <- read_csv("C:/Users/Jonathan/Google Drive/coalmining/data/f923_2013/fuelreceipts_2013.csv") %>%
+fuelreceipts_2013 <- read_csv("../data/f923_2013/fuelreceipts_2013.csv") %>%
   mutate(FUEL_COST = as.numeric(FUEL_COST)) %>%
   setNames(names(fuelreceipts_2014))
-fuelreceipts_2012 <- read_csv("C:/Users/Jonathan/Google Drive/coalmining/data/f923_2012/fuelreceipts_2012.csv")%>%
+fuelreceipts_2012 <- read_csv("../data/f923_2012/fuelreceipts_2012.csv")%>%
   mutate(COALMINE_MSHA_ID = as.numeric(COALMINE_MSHA_ID),
          FUEL_COST = as.numeric(FUEL_COST))%>%
   setNames(names(fuelreceipts_2014))
-fuelreceipts_2011 <- read_csv("C:/Users/Jonathan/Google Drive/coalmining/data/f923_2011/fuelreceipts_2011.csv") %>%
+fuelreceipts_2011 <- read_csv("../data/f923_2011/fuelreceipts_2011.csv") %>%
   mutate(COALMINE_MSHA_ID = as.numeric(COALMINE_MSHA_ID),
          FUEL_COST = as.numeric(FUEL_COST))%>%
   setNames(names(fuelreceipts_2014))
-fuelreceipts_2010 <- read_csv("C:/Users/Jonathan/Google Drive/coalmining/data/f923_2010/fuelreceipts_2010.csv") %>%
+fuelreceipts_2010 <- read_csv("../data/f923_2010/fuelreceipts_2010.csv") %>%
   mutate(CoalMine_MSHA_ID = as.numeric(CoalMine_MSHA_ID),
          Contract_Exp_Date = as.character(Contract_Exp_Date))%>%
   setNames(names(fuelreceipts_2014))
-fuelreceipts_2009 <- read_csv("C:/Users/Jonathan/Google Drive/coalmining/data/f923_2009/fuelreceipts_2009.csv") %>%
+fuelreceipts_2009 <- read_csv("../data/f923_2009/fuelreceipts_2009.csv") %>%
   mutate(CoalMine_MSHA_ID = as.numeric(CoalMine_MSHA_ID),
          Contract_Exp_Date = as.character(Contract_Exp_Date))%>%
   setNames(names(fuelreceipts_2014))
 fuelreceipts_2009 <- fuelreceipts_2009[,1:27] # get rid of a bunch of NA fields
-fuelreceipts_2008 <- read_csv("C:/Users/Jonathan/Google Drive/coalmining/data/f923_2008/fuelreceipts_2008.csv") %>%
+fuelreceipts_2008 <- read_csv("../data/f923_2008/fuelreceipts_2008.csv") %>%
   mutate(Contract_Exp_Date = as.character(Contract_Exp_Date))%>%
   setNames(names(fuelreceipts_2014))
 
-fercreceipts2007 <- read_excel("C:/Users/Jonathan/Google Drive/coalmining/data/old423/f4232007.xls") 
-fercreceipts2006 <- read_excel("C:/Users/Jonathan/Google Drive/coalmining/data/old423/f4232006.xls")
-fercreceipts2005 <- read_excel("C:/Users/Jonathan/Google Drive/coalmining/data/old423/f4232005.xls")
-fercreceipts2004 <- read_excel("C:/Users/Jonathan/Google Drive/coalmining/data/old423/f4232004.xls")
-fercreceipts2003 <- read_excel("C:/Users/Jonathan/Google Drive/coalmining/data/old423/f4232003.xls")
-fercreceipts2002 <- read_excel("C:/Users/Jonathan/Google Drive/coalmining/data/old423/f4232002.xls")
-eiareceipts2007 <- read_excel("C:/Users/Jonathan/Google Drive/coalmining/data/old423/e4232007/f4232007.xls") %>%
+fercreceipts2007 <- read_excel("../data/old423/f4232007.xls") 
+fercreceipts2006 <- read_excel("../data/old423/f4232006.xls")
+fercreceipts2005 <- read_excel("../data/old423/f4232005.xls")
+fercreceipts2004 <- read_excel("../data/old423/f4232004.xls")
+fercreceipts2003 <- read_excel("../data/old423/f4232003.xls")
+fercreceipts2002 <- read_excel("../data/old423/f4232002.xls")
+eiareceipts2007 <- read_excel("../data/old423/e4232007/f4232007.xls") %>%
     mutate(EXPIRATION_DT = as.Date(EXPIRATION_DT, format = '%m/%d/%Y'))
-eiareceipts2006 <- read_excel("C:/Users/Jonathan/Google Drive/coalmining/data/old423/e4232006/f4232006.xls")%>%
+eiareceipts2006 <- read_excel("../data/old423/e4232006/f4232006.xls")%>%
   mutate(EXPIRATION_DT = as.Date(EXPIRATION_DT, format = '%m/%d/%Y'))
-eiareceipts2005 <- read_excel("C:/Users/Jonathan/Google Drive/coalmining/data/old423/e4232005/f4232005.xls")%>%
+eiareceipts2005 <- read_excel("../data/old423/e4232005/f4232005.xls")%>%
   mutate(EXPIRATION_DT = as.Date(EXPIRATION_DT, format = '%m/%d/%Y'))
-eiareceipts2004 <- read_excel("C:/Users/Jonathan/Google Drive/coalmining/data/old423/e4232004/f4232004.xls")%>%
+eiareceipts2004 <- read_excel("../data/old423/e4232004/f4232004.xls")%>%
   mutate(EXPIRATION_DT = as.Date(EXPIRATION_DT, format = '%m/%d/%Y'))
-eiareceipts2003 <- read_excel("C:/Users/Jonathan/Google Drive/coalmining/data/old423/e4232003/e4232003.xls") %>%
+eiareceipts2003 <- read_excel("../data/old423/e4232003/e4232003.xls") %>%
   mutate(EXPIRATION = as.Date(EXPIRATION, format = '%m/%d/%Y'))
-eiareceipts2002 <- read_excel("C:/Users/Jonathan/Google Drive/coalmining/data/old423/e4232002/f4232002.xls")%>%
+eiareceipts2002 <- read_excel("../data/old423/e4232002/f4232002.xls")%>%
   mutate(EXPIRATION_DT = as.Date(EXPIRATION_DT, format = '%m/%d/%Y'))
 names(eiareceipts2003) <- names(eiareceipts2002)
 
-receipts2001 <- read_excel("C:/Users/Jonathan/Google Drive/coalmining/data/old423/f4232001.xls")
-receipts2000 <- read_excel("C:/Users/Jonathan/Google Drive/coalmining/data/old423/f4232000.xls")
-receipts1999 <- read_excel("C:/Users/Jonathan/Google Drive/coalmining/data/old423/f4231999.xls")
-receipts1998 <- read_excel("C:/Users/Jonathan/Google Drive/coalmining/data/old423/f4231998.xls")
-receipts1997 <- read_excel("C:/Users/Jonathan/Google Drive/coalmining/data/old423/f4231997.xls")
-receipts1996 <- read_excel("C:/Users/Jonathan/Google Drive/coalmining/data/old423/f4231996.xls")
-receipts1995 <- read_excel("C:/Users/Jonathan/Google Drive/coalmining/data/old423/f4231995.xls")
-receipts1994 <- read_excel("C:/Users/Jonathan/Google Drive/coalmining/data/old423/f4231994.xls")
-receipts1993 <- read_excel("C:/Users/Jonathan/Google Drive/coalmining/data/old423/f4231993.xls")
-receipts1992 <- read_excel("C:/Users/Jonathan/Google Drive/coalmining/data/old423/f4231992.xls")
-receipts1991 <- read_excel("C:/Users/Jonathan/Google Drive/coalmining/data/old423/f4231991.xls")
-receipts1990 <- read_excel("C:/Users/Jonathan/Google Drive/coalmining/data/old423/f4231990.xls")
+receipts2001 <- read_excel("../data/old423/f4232001.xls")
+receipts2000 <- read_excel("../data/old423/f4232000.xls")
+receipts1999 <- read_excel("../data/old423/f4231999.xls")
+receipts1998 <- read_excel("../data/old423/f4231998.xls")
+receipts1997 <- read_excel("../data/old423/f4231997.xls")
+receipts1996 <- read_excel("../data/old423/f4231996.xls")
+receipts1995 <- read_excel("../data/old423/f4231995.xls")
+receipts1994 <- read_excel("../data/old423/f4231994.xls")
+receipts1993 <- read_excel("../data/old423/f4231993.xls")
+receipts1992 <- read_excel("../data/old423/f4231992.xls")
+receipts1991 <- read_excel("../data/old423/f4231991.xls")
+receipts1990 <- read_excel("../data/old423/f4231990.xls")
 
 fuelreceipts90_98 <- bind_rows(receipts1990,receipts1991,receipts1992,receipts1993,receipts1994,receipts1995,
                                receipts1996,receipts1997,receipts1998)
@@ -227,4 +227,4 @@ coalreceipts$coalminefips[coalreceipts$Coalmine.State == "IM"] <- 9000000 ## Oth
 coalreceipts <- setNames(coalreceipts,make.names(names(coalreceipts),unique = T))
 
 
-write_rds(coalreceipts,path =  "C:/Users/Jonathan/Google Drive/coalmining/coalmining_git/0-data/coalreceipts.rds")
+write_rds(coalreceipts,path =  "../coalmining_git/0-data/coalreceipts.rds")
