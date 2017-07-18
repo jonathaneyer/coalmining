@@ -61,7 +61,7 @@ latlong2congress <- function(pointsDF) {
   library(maptools)
   # Prepare SpatialPolygons object with one SpatialPolygon
   # per county
-  congr <- shapefile("C:/Users/Jonathan/Google Drive/coalmining/data/spatial/cb_2014_us_cd114_5m/cb_2014_us_cd114_5m.shp")
+  congr <- shapefile("../data/spatial/cb_2014_us_cd114_5m/cb_2014_us_cd114_5m.shp")
   IDs <- sapply(strsplit(congr$GEOID, ":"), function(x) x[1])
   # Convert pointsDF to a SpatialPoints object
   pointsSP <- SpatialPoints(pointsDF,
@@ -77,7 +77,7 @@ latlong2congress <- function(pointsDF) {
 latlong2shale <- function(pointsDF) {
   # Prepare SpatialPolygons object with one SpatialPolygon
   # per county
-  shale <- shapefile("C:/Users/Jonathan/Google Drive/coalmining/data/spatial/TightOil_ShaleGas_Plays_Lower48_EIA/TightOil_ShaleGas_US_EIA_Aug2015_v2.shp")
+  shale <- shapefile("../data/spatial/TightOil_ShaleGas_Plays_Lower48_EIA/TightOil_ShaleGas_US_EIA_Aug2015_v2.shp")
   IDs <- sapply(strsplit(shale$Basin, ":"), function(x) x[1])
   # Convert pointsDF to a SpatialPoints object
   pointsSP <- SpatialPoints(pointsDF,
